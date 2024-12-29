@@ -6,6 +6,13 @@ import java.util.Arrays;
 
 import java.util.List;
 
+import org.testng.Assert;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.sun.tools.javac.util.DefinedBy.Api;
+
 import io.restassured.parsing.Parser;
 
 import io.restassured.path.json.JsonPath;
@@ -13,10 +20,12 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
 import io.restassured.response.ResponseBody;
+import pojo.GetCourse;
 
 public class OAuthTest {
 
 	public static void main(String[] args) throws InterruptedException {
+		String[] courseTitles = { "Selenium Webdriver Java", "Cypress", "Protractor" };
 
 		String response =
 
@@ -43,17 +52,32 @@ public class OAuthTest {
 
 		System.out.println(accessToken);
 
-		String r2 = given()
+		GetCourse gc = given().queryParams("access_token", accessToken).when().log().all()
+				.get("https://rahulshettyacademy.com/oauthapi/getCourseDetails").as(GetCourse.class);
 
-				.queryParams("access_token", accessToken)
+		System.out.println(gc.getLinkedln());
+		System.out.println(gc.getInstructor());
+		System.out.println(gc.getCourses().getApi().get(1).getCourseTitle());
 
-				.when()
+		List<pojo.Api> apiCourses = gc.getCourses().getApi();
+		for (int i = 0; i < apiCourses.size(); i++) {
+			if (apiCourses.get(i).getCourseTitle().equalsIgnoreCase("SoapUI Webservices testing")) {
+				System.out.println(apiCourses.get(i).getPrice());
+			}
+		}
 
-				.get("https://rahulshettyacademy.com/oauthapi/getCourseDetails")
+		// Get the course names of WebAutomation
+		ArrayList<String> a = new ArrayList<String>();
 
-				.asString();
+		List<pojo.WebAutomation> w = gc.getCourses().getWebAutomation();
 
-		System.out.println(r2);
+		for (int j = 0; j < w.size(); j++) {
+			a.add(w.get(j).getCourseTitle());
+		}
+
+		List<String> expectedList = Arrays.asList(courseTitles);
+
+		Assert.assertTrue(a.equals(expectedList));
 
 	}
 
