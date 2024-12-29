@@ -30,6 +30,11 @@
 			<version>2.16.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>AutomationAssignment</groupId>
+			<artifactId>AutomationAssignment</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 
